@@ -18,19 +18,5 @@ Heretic's optimization logic often assumes that the "refusal direction" found in
 
 ![][image8]  
 fail because the dimensions of ![][image9] (derived from Layer ![][image6]) do not match the dimensions of ![][image10] (in Layer ![][image7]). This effectively renders the "MuX" protocol, or any global optimization strategy, mathematically impossible without a rewrite of the tool to handle per-layer dimensionality checks.5
-
-### **3.2 The Infrastructure Collapse: RunPod Storage Dynamics**
-
-While the architectural mismatch guaranteed a software failure, the RunPod environment introduced a layer of operational failure that prevented the user from even reaching the execution phase reliably. The recurring failures in downloading and loading the 100GB model are directly attributable to the mismanagement of RunPod's **Container Disk** vs. **Volume Disk**.
-
-#### **3.2.1 The Ephemeral Container Trap**
-
-RunPod pods are containerized environments (Docker/Kubernetes). They provide two distinct storage areas:
-
-1. **Container Disk:** This holds the OS, libraries, and the /root home directory. It is ephemeral. If the pod is stopped or edited, this disk is wiped and reset to the template image.8  
-2. **Volume Disk / Network Volume:** This is persistent storage, typically mounted at /workspace. It survives pod restarts and edits.8
-
-The critical failure point is the default behavior of the Hugging Face transformers library. By default, it caches models in \~/.cache/huggingface, which resides on the **Container Disk**.10 Valkyrie-49B, with 50 billion parameters in BF16, requires approximately **100GB** of disk space for the weights alone (![][image11] bytes).11
-
-Standard RunPod templates often allocate a modest size to the Container Disk (e.g., 20GB or 40GB) to save costs and startup time. When the user initiated the download of Valkyrie, the process filled the root partition (/) before completion. This triggers an OSError: No space left on device and causes the download to terminate or leave corrupted, truncated shard files.12
+rrupted, truncated shard files.12
 
